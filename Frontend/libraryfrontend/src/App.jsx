@@ -52,17 +52,14 @@ function App() {
           sx={{
             display: "flex",
             flexDirection: "column",
-            height: "100vh",
-            overflow: "hidden",
+            minHeight: "100vh",
             background: "linear-gradient(to bottom right, #e8f5e9, #ffffff)", // gradient green-white
           }}
         >
           {/* Fixed Header */}
-          <Box
-            sx={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 1200 }}
-          >
+         
             <Header />
-          </Box>
+         
 
           {/* Scrollable Main Content */}
           <Box
@@ -70,9 +67,9 @@ function App() {
             sx={{
               flexGrow: 1,
               overflowY: "auto",
-              mt: "64px", // match AppBar height
-              mb: "48px", // footer space
               px: 2,
+              pt:{xs:8,md:9},
+              pb:{xs:7,md:8}
             }}
           >
             <Container maxWidth="md">

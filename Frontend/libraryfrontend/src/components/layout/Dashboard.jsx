@@ -48,6 +48,21 @@ const Dashboard = () => {
     dispatch(logout());
     navigate("/login");
   };
+  if (loading || !user) {
+    return (
+      <Box
+        sx={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "linear-gradient(135deg, #a8e063, #ffffff)",
+        }}
+      >
+        <CircularProgress color="success" size={60} />
+      </Box>
+    );
+  }
 
   // Calculate statistics based on user role
   const isAdminOrLibrarian =
@@ -72,21 +87,6 @@ const Dashboard = () => {
         return dayjs(record.due_date).isBefore(dayjs());
       }).length || 0;
 
-  if (loading || !user) {
-    return (
-      <Box
-        sx={{
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "linear-gradient(135deg, #a8e063, #ffffff)",
-        }}
-      >
-        <CircularProgress color="success" size={60} />
-      </Box>
-    );
-  }
 
   return (
     <Box
@@ -105,8 +105,10 @@ const Dashboard = () => {
           boxShadow: "2px 0 10px rgba(0,0,0,0.05)",
           display: "flex",
           flexDirection: "column",
-          position: { xs: "relative", md: "sticky" },
-          top: 0,
+          justifyContent: "space-between",
+          position: "fixed",
+          top: "64px",
+          left:0,
           height: { md: "100vh" },
         }}
       >
@@ -182,7 +184,7 @@ const Dashboard = () => {
             onClick={handleLogout}
             fullWidth
             sx={{
-              mt: "auto",
+              mt: 4,
               fontWeight: "bold",
               textTransform: "none",
               py: 1.5,

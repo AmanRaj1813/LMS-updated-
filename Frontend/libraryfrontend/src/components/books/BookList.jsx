@@ -11,6 +11,7 @@ import {
   Button,
   CircularProgress,
   Alert,
+  Paper,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
@@ -31,14 +32,21 @@ const BookList = () => {
         justifyContent="center"
         alignItems="center"
         minHeight="80vh"
+        sx={{ background: "linear-gradient(135deg, #e8f5e9, #ffffff)" }}
       >
-        <CircularProgress color="primary" />
+        <CircularProgress color="success" />
       </Box>
     );
 
   if (error)
     return (
-      <Box textAlign="center" mt={8}>
+      <Box
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+        minHeight="80vh"
+        sx={{ background: "linear-gradient(135deg, #e8f5e9, #ffffff)" }}
+      >
         <Alert severity="error">Error: {error}</Alert>
       </Box>
     );
@@ -46,87 +54,141 @@ const BookList = () => {
   return (
     <Box
       sx={{
-        minHeight: "100vh",
-        background: "linear-gradient(to right, #a8e063, #ffffff)",
-        py: 6,
+        minHeight: "calc(100vh - 112px)",
+        display: "flex",
+        justifyContent: "center",
+        background: "linear-gradient(135deg, #e8f5e9, #ffffff)",
+        px: 2,
+        py: 4,
       }}
     >
-      <Box
-        maxWidth="1100px"
-        mx="auto"
-        bgcolor="white"
-        p={4}
-        borderRadius={3}
-        boxShadow={3}
+      <Paper
+        elevation={8}
+        sx={{
+          p: 0,
+          borderRadius: 4,
+          width: "100%",
+          maxWidth: 1100,
+          bgcolor: "white",
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
       >
-        {/* Title */}
-        <Box textAlign="center" mb={4}>
+        {/* ✅ Sticky Header Section */}
+        <Box
+          sx={{
+            position: "sticky",
+            top: 0,
+            backgroundColor: "white",
+            zIndex: 2,
+            borderBottom: "1px solid rgba(0,0,0,0.1)",
+            p: 3,
+            textAlign: "center",
+          }}
+        >
           <Typography
             variant="h4"
-            color="primary"
+            fontWeight="bold"
+            color="text.primary"
+            gutterBottom
+          >
+            Library System
+          </Typography>
+          <Typography
+            variant="h5"
+            color="success.main"
             fontWeight="bold"
             display="flex"
             alignItems="center"
             justifyContent="center"
             gap={1}
+            gutterBottom
           >
             <MenuBookIcon fontSize="large" />
             Available Books
           </Typography>
-        </Box>
 
-        {/* Search Button */}
-        <Box textAlign="center" mb={4}>
           <Button
             variant="contained"
             color="success"
             startIcon={<SearchIcon />}
             onClick={() => navigate("/books/search")}
-            sx={{ px: 4, py: 1.2, borderRadius: 2 }}
+            sx={{
+              px: 4,
+              py: 1.2,
+              borderRadius: 2,
+              background: "linear-gradient(135deg, #43a047, #66bb6a)",
+              "&:hover": {
+                background: "linear-gradient(135deg, #388e3c, #4caf50)",
+              },
+              fontWeight: "bold",
+            }}
           >
             Search Books
           </Button>
         </Box>
 
-        {/* Book Grid */}
-        {books.length === 0 ? (
-          <Typography textAlign="center" color="textSecondary">
-            No books available at the moment.
-          </Typography>
-        ) : (
-          <Grid container spacing={3}>
-            {books.map((book) => (
-              <Grid item xs={12} sm={6} md={4} key={book.id}>
-                <Card
-                  sx={{
-                    cursor: "pointer",
-                    transition: "0.3s",
-                    "&:hover": { boxShadow: 6, transform: "scale(1.02)" },
-                  }}
-                  onClick={() => navigate(`./${book.id}`)}
-                >
-                  <CardContent>
-                    <Typography
-                      variant="h6"
-                      color="primary"
-                      fontWeight="bold"
-                      gutterBottom
-                    >
-                      {book.title}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Author: {book.author}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Category: {book.category}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        )}
-      </Box>
+        {/* ✅ Scrollable Book Grid with hidden scrollbar */}
+        <Box
+          sx={{
+            flexGrow: 1,
+            overflowY: "auto",
+            p: 4,
+            scrollBehavior: "smooth",
+            // Hide scrollbar (cross-browser)
+            "&::-webkit-scrollbar": { display: "none" },
+            "-ms-overflow-style": "none", // IE/Edge
+            "scrollbar-width": "none", // Firefox
+          }}
+        >
+          {books.length === 0 ? (
+            <Typography
+              textAlign="center"
+              color="textSecondary"
+              sx={{ fontStyle: "italic" }}
+            >
+              No books available at the moment.
+            </Typography>
+          ) : (
+            <Grid container spacing={3} justifyContent="center">
+              {books.map((book) => (
+                <Grid item xs={12} sm={6} md={4} key={book.id}>
+                  <Card
+                    sx={{
+                      cursor: "pointer",
+                      transition: "0.3s",
+                      borderRadius: 3,
+                      "&:hover": {
+                        boxShadow: 6,
+                        transform: "scale(1.02)",
+                      },
+                    }}
+                    onClick={() => navigate(`./${book.id}`)}
+                  >
+                    <CardContent>
+                      <Typography
+                        variant="h6"
+                        color="primary"
+                        fontWeight="bold"
+                        gutterBottom
+                      >
+                        {book.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Author: {book.author}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        Category: {book.category}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          )}
+        </Box>
+      </Paper>
     </Box>
   );
 };

@@ -10,11 +10,12 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 const Header = () => {
   return (
     <AppBar
-      position="static"
+      position="fixed"
       sx={{
         background: "linear-gradient(135deg, #a8e063, #ffffff)",
         color: "black",
         boxShadow: 3,
+        zIndex: (theme) => theme.zIndex.drawer + 1
       }}
     >
       <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
