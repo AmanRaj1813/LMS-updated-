@@ -30,6 +30,8 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CloseIcon from "@mui/icons-material/Close";
+import { Alert, Snackbar } from "@mui/material";
+
 
 const BorrowList = () => {
   const dispatch = useDispatch();
@@ -114,23 +116,22 @@ const BorrowList = () => {
             {isAdminOrLibrarian ? "All Borrowed Books" : "Your Borrowed Books"}
           </Typography>
 
-          {successMessage && (
-            <Typography
-              textAlign="center"
-              color="success.main"
-              mb={2}
-              variant="body1"
-            >
-              ✅ {successMessage}
-              <Button
-                onClick={() => dispatch(clearBorrowSuccess())}
-                size="small"
-                sx={{ ml: 1 }}
-              >
-                OK
-              </Button>
-            </Typography>
-          )}
+          <Snackbar
+  open={Boolean(successMessage)}
+  autoHideDuration={4000}
+  onClose={() => dispatch(clearBorrowSuccess())}
+  anchorOrigin={{ vertical: "top", horizontal: "center" }}
+>
+  <Alert
+    onClose={() => dispatch(clearBorrowSuccess())}
+    severity="success"
+    sx={{ width: "100%" }}
+    elevation={6}
+    variant="filled"
+  >
+    {successMessage}
+  </Alert>
+</Snackbar>
 
           {error && (
             <Typography textAlign="center" color="error" mb={2}>

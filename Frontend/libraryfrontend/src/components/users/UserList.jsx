@@ -1,4 +1,3 @@
-// src/components/users/UserList.jsx
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsers, deleteUser } from "../../redux/slices/userSlice";
@@ -16,7 +15,6 @@ import {
   Alert,
   Button,
 } from "@mui/material";
-import { Link } from "react-router-dom";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 
@@ -52,64 +50,54 @@ const UserList = () => {
     );
 
   return (
-    <Box
-      sx={{
-        maxWidth: "90%",
-        mx: "auto",
-        mt: 8,
-        mb: 6,
-      }}
-    >
-      <Paper
-        elevation={4}
-        sx={{
-          p: 3,
-          borderRadius: 3,
-          overflowX: "auto",
-        }}
-      >
+    <Box sx={{ maxWidth: "90%", mx: "auto", mt: 8, mb: 6 }}>
+      <Paper elevation={4} sx={{ p: 3, borderRadius: 3 }}>
         {/* Header */}
-        <Box display="flex" alignItems="center" justifyContent="center" mb={3}>
-          <ManageAccountsIcon color="green" sx={{ fontSize: 32, mr: 1 }} />
+        <Box display="flex" alignItems="center" justifyContent="center" mb={2}>
+          <ManageAccountsIcon color="success" sx={{ fontSize: 32, mr: 1 }} />
           <Typography variant="h5" fontWeight="bold" color="green">
             User Management
           </Typography>
         </Box>
 
-        {/* Empty state */}
-        {users.length === 0 ? (
-          <Typography
-            variant="body1"
-            color="text.secondary"
-            align="center"
-            sx={{ py: 4 }}
-          >
-            No users found.
-          </Typography>
-        ) : (
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow sx={{ backgroundColor: "green" }}>
-                  <TableCell sx={{ fontWeight: "bold", color: "white" }}>
-                    ID
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: "bold", color: "white" }}>
-                    Name
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: "bold", color: "white" }}>
-                    Email
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: "bold", color: "white" }}>
-                    Role
-                  </TableCell>
-                  <TableCell sx={{ fontWeight: "bold", color: "white" }}>
-                    Actions
+        {/* Table */}
+        <TableContainer
+          component={Paper}
+          sx={{
+            maxHeight: 500, // set scrollable height
+            borderRadius: 2,
+            overflowY: "auto",
+          }}
+        >
+          <Table stickyHeader>
+            <TableHead>
+              <TableRow sx={{ backgroundColor: "green" }}>
+                <TableCell sx={{ fontWeight: "bold", color: "green" }}>
+                  ID
+                </TableCell>
+                <TableCell sx={{ fontWeight: "bold", color: "green" }}>
+                  Name
+                </TableCell>
+                <TableCell sx={{ fontWeight: "bold", color: "green" }}>
+                  Email
+                </TableCell>
+                <TableCell sx={{ fontWeight: "bold", color: "green" }}>
+                  Role
+                </TableCell>
+                <TableCell sx={{ fontWeight: "bold", color: "green" }}>
+                  Actions
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {users.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} align="center">
+                    No users found.
                   </TableCell>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {users.map((user) => (
+              ) : (
+                users.map((user) => (
                   <TableRow
                     key={user.id}
                     hover
@@ -126,7 +114,6 @@ const UserList = () => {
                     <TableCell>
                       <Button
                         onClick={() => handleDelete(user.id)}
-                        to={`/users/${user.id}`}
                         variant="contained"
                         size="small"
                         startIcon={<VisibilityIcon />}
@@ -134,21 +121,21 @@ const UserList = () => {
                           textTransform: "none",
                           borderRadius: 2,
                           fontWeight: 500,
-                          backgroundColor: "primary.main",
+                          backgroundColor: "green",
                           "&:hover": {
-                            backgroundColor: "primary.dark",
+                            backgroundColor: "red",
                           },
                         }}
                       >
-                        delete
+                        Delete
                       </Button>
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        )}
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </Paper>
     </Box>
   );

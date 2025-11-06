@@ -41,13 +41,14 @@ import UserList from "./components/users/UserList";
 import BookDetail from "./components/books/BookDetail";
 import FinePaymentHistory from "./components/layout/pages/FinePaymentHistory";
 import ErrorPage from "./components/layout/pages/ErrorPage";
+import LandingPage from "./components/layout/pages/LandingPage";
 
 function AppContent() {
   const location = useLocation();
 
   // ✅ Hide Header/Footer on login or register page
   const hideLayout =
-    location.pathname === "/login" || location.pathname === "/register";
+    location.pathname === "/login" || location.pathname === "/register" || location.pathname === "/";
 
   return (
     <Box
@@ -72,114 +73,167 @@ function AppContent() {
           pb: hideLayout ? 0 : { xs: 7, md: 8 },
         }}
       >
-        <Container maxWidth="md">
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+        <Routes>
+          <Route path = "/" element = {<LandingPage/>}/>
+          {/* Public Routes (with Container) */}
+          <Route
+            path="/login"
+            element={
+              <Container maxWidth="md">
+                <Login />
+              </Container>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <Container maxWidth="md">
+                <Register />
+              </Container>
+            }
+          />
 
-            {/* Protected Routes */}
-            <Route
-              path="/dashboard"
-              element={
-                <PrivateRoute>
+          {/* Protected Routes */}
+          <Route
+            path="/dashboard"
+            element={
+              <PrivateRoute>
+                <Container maxWidth="lg">
                   <Dashboard />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/books"
-              element={
-                <PrivateRoute>
-                  <BookList />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/books/search"
-              element={
-                <PrivateRoute>
+                </Container>
+              </PrivateRoute>
+            }
+          />
+
+          {/* ✅ BookList — Full width (no Container restriction) */}
+          <Route
+            path="/books"
+            element={
+              <PrivateRoute>
+                <BookList />
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/books/search"
+            element={
+              <PrivateRoute>
+                <Container maxWidth="lg">
                   <BookSearch />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/books/:id"
-              element={
-                <PrivateRoute>
+                </Container>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/books/:id"
+            element={
+              <PrivateRoute>
+                <Container maxWidth="lg">
                   <BookDetail />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/books/new"
-              element={
-                <PrivateRoute librarianAllowed>
+                </Container>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/books/new"
+            element={
+              <PrivateRoute librarianAllowed>
+                <Container maxWidth="md">
                   <BookForm />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/borrows"
-              element={
-                <PrivateRoute>
+                </Container>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/borrows"
+            element={
+              <PrivateRoute>
+                <Container maxWidth="lg">
                   <BorrowForm />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/my-borrows"
-              element={
-                <PrivateRoute>
+                </Container>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/my-borrows"
+            element={
+              <PrivateRoute>
+                <Container maxWidth="lg">
                   <BorrowList />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/categories"
-              element={
-                <PrivateRoute>
+                </Container>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/categories"
+            element={
+              <PrivateRoute>
+                <Container maxWidth="lg">
                   <CategoryList />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/categories/new"
-              element={
-                <PrivateRoute librarianAllowed>
+                </Container>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/categories/new"
+            element={
+              <PrivateRoute librarianAllowed>
+                <Container maxWidth="md">
                   <CategoryForm />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/fines"
-              element={
-                <PrivateRoute librarianAllowed>
+                </Container>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/fines"
+            element={
+              <PrivateRoute librarianAllowed>
+                <Container maxWidth="lg">
                   <FinePaymentHistory />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/users"
-              element={
-                <PrivateRoute adminOnly>
+                </Container>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/users"
+            element={
+              <PrivateRoute adminOnly>
+                <Container maxWidth="lg">
                   <UserList />
-                </PrivateRoute>
-              }
-            />
-            <Route path="/error" element={<ErrorPage />} />
-            {/* Default Routes */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        </Container>
+                </Container>
+              </PrivateRoute>
+            }
+          />
+
+          <Route
+            path="/error"
+            element={
+              <Container maxWidth="md">
+                <ErrorPage />
+              </Container>
+            }
+          />
+
+          {/* Default Routes */}
+          
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
       </Box>
 
       {/* ✅ Only show Footer if not on login/register */}
       {!hideLayout && (
         <Box
           sx={{
-            position: "fixed",
+            position: {xs:"relative",md:"fixed",lg:"fixed"},
             bottom: 0,
             left: 0,
             right: 0,
@@ -195,12 +249,12 @@ function AppContent() {
 
 export default function App() {
   return (
-    <Provider store={store}>
+    
       <Router>
         <CssBaseline />
         <AppContent />
         <ToastContainer />
       </Router>
-    </Provider>
+
   );
 }

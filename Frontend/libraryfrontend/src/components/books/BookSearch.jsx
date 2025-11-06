@@ -65,7 +65,7 @@ const BookSearch = () => {
           <Typography
             variant="h4"
             fontWeight="bold"
-            color="text.primary"
+            color="green"
             textAlign="center"
           >
             Library System

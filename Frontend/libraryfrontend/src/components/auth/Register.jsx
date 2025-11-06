@@ -36,7 +36,6 @@ const Register = () => {
   const validateForm = () => {
     const errors = {};
 
-    // Username validation
     if (!formData.username.trim()) {
       errors.username = "Username is required";
     } else if (formData.username.length < 3) {
@@ -45,14 +44,12 @@ const Register = () => {
       errors.username = "Username cannot contain spaces";
     }
 
-    // Email validation
     if (!formData.email.trim()) {
       errors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       errors.email = "Enter a valid email address";
     }
 
-    // Password validation
     if (!formData.password) {
       errors.password = "Password is required";
     } else if (formData.password.length < 6) {
@@ -62,7 +59,6 @@ const Register = () => {
         "Password must contain at least one uppercase, one lowercase, and one number";
     }
 
-    // Role validation
     if (!formData.role) {
       errors.role = "Role is required";
     }
@@ -73,14 +69,14 @@ const Register = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setFormErrors({ ...formErrors, [e.target.name]: "" }); // clear specific error
+    setFormErrors({ ...formErrors, [e.target.name]: "" });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     dispatch(clearError());
 
-    if (!validateForm()) return; // prevent submit if invalid
+    if (!validateForm()) return;
 
     try {
       await dispatch(register(formData)).unwrap();
@@ -90,6 +86,13 @@ const Register = () => {
       console.error("Registration failed:", err);
     }
   };
+
+  // ✅ Disable button until all required fields are filled
+  const isFormValid =
+    formData.username.trim() !== "" &&
+    formData.email.trim() !== "" &&
+    formData.password.trim() !== "" &&
+    formData.role.trim() !== "";
 
   return (
     <div
@@ -233,7 +236,7 @@ const Register = () => {
                 background: "linear-gradient(135deg, #388e3c, #4caf50)",
               },
             }}
-            disabled={loading}
+            disabled={loading || !isFormValid} // ✅ Disable if form incomplete or loading
             startIcon={!loading && <HowToRegIcon />}
           >
             {loading ? (

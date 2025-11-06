@@ -1,0 +1,15 @@
+Internal Server Error: /api/books/15
+Traceback (most recent call last):
+  File "D:\Jarvis\Unext Assignment\capstone new 2\LMS-5\Backend\venv\Lib\site-packages\django\core\handlers\exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Jarvis\Unext Assignment\capstone new 2\LMS-5\Backend\venv\Lib\site-packages\django\utils\deprecation.py", line 122, in __call__
+    response = self.process_response(request, response)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Jarvis\Unext Assignment\capstone new 2\LMS-5\Backend\venv\Lib\site-packages\django\middleware\common.py", line 108, in process_response
+    return self.response_redirect_class(self.get_full_path_with_slash(request))
+                                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\Jarvis\Unext Assignment\capstone new 2\LMS-5\Backend\venv\Lib\site-packages\django\middleware\common.py", line 87, in get_full_path_with_slash
+    raise RuntimeError(
+RuntimeError: You called this URL via DELETE, but the URL doesn't end in a slash and you have APPEND_SLASH set. Django can't redirect to the slash URL while maintaining DELETE data. Change your form to point to localhost:8000/api/books/15/ (note the trailing slash), or set APPEND_SLASH=False in your Django settings.
+"DELETE /api/books/15 HTTP/1.1" 500 74218

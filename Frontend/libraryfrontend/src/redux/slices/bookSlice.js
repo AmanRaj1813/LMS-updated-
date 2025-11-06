@@ -41,7 +41,7 @@ const response = await apiClient.put(`/books/${id}/`,updatedData);
 return response;
 })
 export const deleteBook = createAsyncThunk('books/deleteBook',async(id)=> {
-    await apiClient.delete(`/books/${id}`);
+    await apiClient.delete(`/books/${id}/`);
     return id;
 })
 const bookSlice = createSlice({

@@ -40,7 +40,7 @@ const Header = () => {
         <Box sx={{ display: "flex", gap: 2 }}>
           <Button
             component={Link}
-            to="/"
+            to="/dashboard"
             startIcon={<HomeIcon />}
             sx={{
               color: "green",
