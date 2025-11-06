@@ -55,10 +55,14 @@ const Login = () => {
     }
   };
 
+  // ✅ Disable login button until username and password are filled
+  const isFormValid =
+    credentials.username.trim() !== "" && credentials.password.trim() !== "";
+
   return (
     <Box
       sx={{
-        height: "calc(100vh - 112px)", // full height minus header/footer
+        height: "calc(100vh - 112px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -154,7 +158,7 @@ const Login = () => {
                 background: "linear-gradient(135deg, #388e3c, #4caf50)",
               },
             }}
-            disabled={loading}
+            disabled={loading || !isFormValid} // ✅ disabled condition
             startIcon={!loading && <LoginIcon />}
           >
             {loading ? (

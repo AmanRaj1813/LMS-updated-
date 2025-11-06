@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+
 from django.shortcuts import render
 from .models import User, Book, BorrowRecord, Category
 from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
@@ -114,12 +115,12 @@ class BorrowRecordViewSet(viewsets.ModelViewSet):
         # Update return date
         borrow_record.return_date = timezone.now()
         borrow_record.save()
-
+        now = timezone.now()
         # Fine calculation
-        if now > borrow_record.due_date:
-            days_late = (now - borrow_record.due_date).days
+        if now.date() >= borrow_record.due_date.date():
+            days_late = (now.date() - borrow_record.due_date.date()).days + 1
             borrow_record.fine_amount = days_late * 10  # ₹10 per day
-            borrow_record.fine_paid = False
+            borrow_record.fine_paid = True
 
         borrow_record.save()
         
@@ -133,6 +134,7 @@ class BorrowRecordViewSet(viewsets.ModelViewSet):
             message += f" with a fine of ₹{borrow_record.fine_amount}"
 
         return Response({'message': message})
+    
     # ✅ Librarian/Admin — view all unpaid fines
     @action(detail=False, methods=['get'], permission_classes=[IsAdminUser])
     def unpaid_fines(self, request):

@@ -111,9 +111,7 @@ const BorrowList = () => {
             color="green"
             textAlign="center"
           >
-            {isAdminOrLibrarian
-              ? "All Borrowed Books"
-              : "Your Borrowed Books"}
+            {isAdminOrLibrarian ? "All Borrowed Books" : "Your Borrowed Books"}
           </Typography>
 
           {successMessage && (
@@ -220,13 +218,26 @@ const BorrowList = () => {
                           {dayjs(record.borrow_date).format("DD MMM YYYY")}
                         </Typography>
                         <Typography variant="body2">
-                          Due Date: {dayjs(record.due_date).format("DD MMM YYYY")}
+                          Due Date:{" "}
+                          {dayjs(record.due_date).format("DD MMM YYYY")}
                         </Typography>
                         {record.return_date && (
-                          <Typography variant="body2">
-                            Returned on:{" "}
-                            {dayjs(record.return_date).format("DD MMM YYYY")}
-                          </Typography>
+                          <>
+                            <Typography variant="body2">
+                              Returned on:{" "}
+                              {dayjs(record.return_date).format("DD MMM YYYY")}
+                            </Typography>
+
+                            {Number(record.fine_amount) > 0 && (
+                              <Typography
+                                variant="body2"
+                                color="error"
+                                sx={{ fontWeight: "bold", mt: 1 }}
+                              >
+                                Fine: ₹{record.fine_amount}
+                              </Typography>
+                            )}
+                          </>
                         )}
 
                         <Box mt={2}>

@@ -39,6 +39,11 @@ axiosInstance.interceptors.response.use(
       "Request failed";
 
     console.error("API Error:", message);
+    if (status && status >= 400) {
+      window.location.href = `/error?status=${status}&message=${encodeURIComponent(
+        message
+      )}`;
+    }
     return Promise.reject(new Error(message));
   }
 );

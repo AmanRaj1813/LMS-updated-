@@ -30,15 +30,57 @@ const Register = () => {
     role: "member",
   });
 
+  const [formErrors, setFormErrors] = useState({});
   const [success, setSuccess] = useState(false);
+
+  const validateForm = () => {
+    const errors = {};
+
+    // Username validation
+    if (!formData.username.trim()) {
+      errors.username = "Username is required";
+    } else if (formData.username.length < 3) {
+      errors.username = "Username must be at least 3 characters";
+    } else if (/\s/.test(formData.username)) {
+      errors.username = "Username cannot contain spaces";
+    }
+
+    // Email validation
+    if (!formData.email.trim()) {
+      errors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      errors.email = "Enter a valid email address";
+    }
+
+    // Password validation
+    if (!formData.password) {
+      errors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      errors.password = "Password must be at least 6 characters";
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+      errors.password =
+        "Password must contain at least one uppercase, one lowercase, and one number";
+    }
+
+    // Role validation
+    if (!formData.role) {
+      errors.role = "Role is required";
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormErrors({ ...formErrors, [e.target.name]: "" }); // clear specific error
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     dispatch(clearError());
+
+    if (!validateForm()) return; // prevent submit if invalid
 
     try {
       await dispatch(register(formData)).unwrap();
@@ -52,7 +94,7 @@ const Register = () => {
   return (
     <div
       style={{
-        minHeight: "calc(100vh - 140px)", // fits between fixed header and footer
+        minHeight: "calc(100vh - 140px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -103,6 +145,8 @@ const Register = () => {
             onChange={handleChange}
             margin="dense"
             required
+            error={!!formErrors.username}
+            helperText={formErrors.username}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -121,6 +165,8 @@ const Register = () => {
             onChange={handleChange}
             margin="dense"
             required
+            error={!!formErrors.email}
+            helperText={formErrors.email}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -139,6 +185,8 @@ const Register = () => {
             onChange={handleChange}
             margin="dense"
             required
+            error={!!formErrors.password}
+            helperText={formErrors.password}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -156,6 +204,8 @@ const Register = () => {
             value={formData.role}
             onChange={handleChange}
             margin="dense"
+            error={!!formErrors.role}
+            helperText={formErrors.role}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">

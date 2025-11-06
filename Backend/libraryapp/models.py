@@ -1,7 +1,8 @@
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from datetime import timedelta,datetime
+from django.utils import timezone
 class User(AbstractUser):
     ROLES = (
         ('admin', 'Admin'),
@@ -54,9 +55,9 @@ class BorrowRecord(models.Model):
         """Automatically calculate fine if overdue."""
         if not self.return_date:
             return 0
-        if self.return_date > self.due_date:
-            days_overdue = (self.return_date - self.due_date).days
-            return days_overdue * 10  # Example: ₹10/day fine
+        days_overdue = (self.return_date.date() - self.due_date.date()).days + 1;
+        if days_overdue > 0:
+            return days_overdue * 10  # ₹10 per day 
         return 0
 
     def save(self, *args, **kwargs):
