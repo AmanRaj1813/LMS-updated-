@@ -10,6 +10,8 @@ import { Provider } from "react-redux";
 import store from "./redux/store";
 import { ToastContainer } from "react-toastify";
 import { Box, CssBaseline, Container } from "@mui/material";
+import About from "./components/layout/pages/About";
+import Contact from "./components/layout/pages/Contact";
 
 // Auth Components
 import Login from "./components/auth/Login";
@@ -74,7 +76,7 @@ function AppContent() {
         }}
       >
         <Routes>
-          <Route path = "/" element = {<LandingPage/>}/>
+          <Route path="/" element={<LandingPage />} />
           {/* Public Routes (with Container) */}
           <Route
             path="/login"
@@ -100,6 +102,26 @@ function AppContent() {
               <PrivateRoute>
                 <Container maxWidth="lg">
                   <Dashboard />
+                </Container>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/about"
+            element={
+              <PrivateRoute>
+                <Container maxWidth="lg">
+                  <About />
+                </Container>
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/contact"
+            element={
+              <PrivateRoute>
+                <Container maxWidth="lg">
+                  <Contact />
                 </Container>
               </PrivateRoute>
             }
@@ -224,7 +246,7 @@ function AppContent() {
           />
 
           {/* Default Routes */}
-          
+
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Box>
@@ -233,7 +255,7 @@ function AppContent() {
       {!hideLayout && (
         <Box
           sx={{
-            position: {xs:"relative",md:"fixed",lg:"fixed"},
+            position: { xs: "relative", md: "fixed", lg: "fixed" },
             bottom: 0,
             left: 0,
             right: 0,

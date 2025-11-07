@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { logout, fetchCurrentUser } from "../../redux/slices/authSlice";
@@ -9,15 +9,13 @@ import {
   Box,
   Button,
   Card,
-  CardContent,
   CircularProgress,
   Divider,
+  Drawer,
   Grid,
+  IconButton,
   Stack,
   Typography,
-  Paper,
-  Drawer,
-  IconButton,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -29,17 +27,18 @@ import CategoryIcon from "@mui/icons-material/Category";
 import PaidIcon from "@mui/icons-material/Paid";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
+import AutorenewIcon from "@mui/icons-material/Autorenew";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import WarningIcon from "@mui/icons-material/Warning";
 import dayjs from "dayjs";
-import AutorenewIcon from "@mui/icons-material/Autorenew"; // For borrowed books
-import MenuBookIcon from "@mui/icons-material/MenuBook";     // For available books
-import WarningIcon from "@mui/icons-material/Warning";       // For overdue books
+import { motion } from "framer-motion";
 
 const Dashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
   const { books } = useSelector((state) => state.books);
@@ -82,7 +81,6 @@ const Dashboard = () => {
     );
   }
 
-  // Calculate statistics based on user role
   const isAdminOrLibrarian =
     user?.role === "admin" || user?.role === "librarian";
 
@@ -95,17 +93,19 @@ const Dashboard = () => {
   const availableBooks = books?.length || 0;
 
   const overdueBooks = isAdminOrLibrarian
-    ? records?.filter((record) => {
-        if (record.return_date) return false;
-        return dayjs(record.due_date).isBefore(dayjs());
-      }).length || 0
-    : records?.filter((record) => {
-        if (record.return_date) return false;
-        if (record.user !== user.id) return false;
-        return dayjs(record.due_date).isBefore(dayjs());
-      }).length || 0;
+    ? records?.filter(
+        (record) =>
+          !record.return_date && dayjs(record.due_date).isBefore(dayjs())
+      ).length || 0
+    : records?.filter(
+        (record) =>
+          !record.return_date &&
+          record.user === user.id &&
+          dayjs(record.due_date).isBefore(dayjs())
+      ).length || 0;
 
-  // Sidebar content component
+  const drawerWidth = 280;
+
   const SidebarContent = () => (
     <Box
       sx={{
@@ -115,7 +115,6 @@ const Dashboard = () => {
         bgcolor: "#fff",
       }}
     >
-      {/* Mobile close button */}
       {isMobile && (
         <Box sx={{ display: "flex", justifyContent: "flex-end", p: 2 }}>
           <IconButton onClick={handleDrawerToggle}>
@@ -219,7 +218,54 @@ const Dashboard = () => {
     </Box>
   );
 
-  const drawerWidth = 280;
+  // Quick Actions & Management Tools Config
+  const quickActions = [
+    {
+      label: "View Books",
+      icon: <LibraryBooksIcon />,
+      color: "success",
+      path: "/books",
+    },
+    {
+      label: "Borrow Books",
+      icon: <MenuBookIcon />,
+      color: "primary",
+      path: "/borrows",
+    },
+    {
+      label: isAdminOrLibrarian ? "All Borrowed Books" : "My Books",
+      icon: <LibraryBooksIcon />,
+      color: "secondary",
+      path: "/my-borrows",
+    },
+    {
+      label: "Categories",
+      icon: <CategoryIcon />,
+      color: "warning",
+      path: "/categories",
+    },
+  ];
+
+  const managementTools = [
+    {
+      label: "Add Book",
+      icon: <AddIcon />,
+      color: "secondary",
+      path: "/books/new",
+    },
+    {
+      label: "View Members",
+      icon: <PeopleIcon />,
+      color: "info",
+      path: "/users",
+    },
+    {
+      label: "Manage Fines",
+      icon: <PaidIcon />,
+      color: "error",
+      path: "/fines",
+    },
+  ];
 
   return (
     <Box
@@ -237,30 +283,19 @@ const Dashboard = () => {
             position: "fixed",
             top: 16,
             left: 16,
-            zIndex: 1300,
+            zIndex: 1500,
             bgcolor: "success.main",
             color: "white",
-            "&:hover": {
-              bgcolor: "success.dark",
-            },
+            "&:hover": { bgcolor: "success.dark" },
           }}
         >
           <MenuIcon />
         </IconButton>
       )}
 
-      {/* Sidebar - Desktop (Fixed) */}
+      {/* Sidebar */}
       {!isMobile && (
-        <Box
-          sx={{
-            width: drawerWidth,
-            flexShrink: 0,
-            "& .MuiDrawer-paper": {
-              width: drawerWidth,
-              boxSizing: "border-box",
-            },
-          }}
-        >
+        <Box sx={{ width: drawerWidth, flexShrink: 0 }}>
           <Box
             sx={{
               width: drawerWidth,
@@ -279,15 +314,13 @@ const Dashboard = () => {
         </Box>
       )}
 
-      {/* Sidebar - Mobile (Drawer) */}
+      {/* Mobile Drawer */}
       {isMobile && (
         <Drawer
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better mobile performance
-          }}
+          ModalProps={{ keepMounted: true }}
           sx={{
             display: { xs: "block", md: "none" },
             "& .MuiDrawer-paper": {
@@ -300,7 +333,7 @@ const Dashboard = () => {
         </Drawer>
       )}
 
-      {/* Main Content Area */}
+      {/* Main Content */}
       <Box
         component="main"
         sx={{
@@ -309,6 +342,7 @@ const Dashboard = () => {
           width: { xs: "100%", md: `calc(100% - ${drawerWidth}px)` },
           ml: { xs: 0, md: 0 },
           overflowY: "auto",
+          pt: { xs: 8, sm: 4, md: 2 },
         }}
       >
         <Box sx={{ maxWidth: 1200, mx: "auto", mt: { xs: 6, md: 2 } }}>
@@ -341,20 +375,20 @@ const Dashboard = () => {
                   },
                 }}
               >
-                 <Box
-        sx={{
-          mb:2,
-          display: "flex",
-          justifyContent: "center",
-          animation: "spin 2s linear infinite",
-          "@keyframes spin": {
-            "0%": { transform: "rotate(0deg)" },
-            "100%": { transform: "rotate(360deg)" },
-          },
-        }}
-      >
-        <AutorenewIcon color="primary" sx={{ fontSize: 50 }} />
-      </Box>
+                <Box
+                  sx={{
+                    mb: 2,
+                    display: "flex",
+                    justifyContent: "center",
+                    animation: "spin 2s linear infinite",
+                    "@keyframes spin": {
+                      "0%": { transform: "rotate(0deg)" },
+                      "100%": { transform: "rotate(360deg)" },
+                    },
+                  }}
+                >
+                  <AutorenewIcon color="primary" sx={{ fontSize: 50 }} />
+                </Box>
                 <Typography
                   variant="h3"
                   fontWeight="bold"
@@ -372,267 +406,245 @@ const Dashboard = () => {
                 </Typography>
               </Card>
             </Grid>
-            <Grid item xs={12} sm={6} md={4}>
-    <Card
-      sx={{
-        p: { xs: 3, sm: 4 },
-        borderRadius: 4,
-        boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
-        borderLeft: "8px solid #4caf50",
-        transition: "transform 0.2s",
-        "&:hover": {
-          transform: "translateY(-6px)",
-          boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
-        },
-      }}
-    >
-      {/* Floating Icon */}
-      <Box
-        sx={{
-          mb: 2,
-          display: "flex",
-          justifyContent: "center",
-          animation: "float 2s ease-in-out infinite",
-          "@keyframes float": {
-            "0%, 100%": { transform: "translateY(0px)" },
-            "50%": { transform: "translateY(-15px)" },
-          },
-        }}
-      >
-        <MenuBookIcon color="success" sx={{ fontSize: 50 }} />
-      </Box>
 
-      <Typography
-        variant="h3"
-        fontWeight="bold"
-        color="success.main"
-        sx={{ fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" } }}
-      >
-        {availableBooks}
-      </Typography>
-      <Typography
-        color="text.secondary"
-        variant="h6"
-        sx={{ fontSize: { xs: "1rem", sm: "1.125rem" } }}
-      >
-        Books List
-      </Typography>
-    </Card>
-  </Grid>
             <Grid item xs={12} sm={6} md={4}>
-    <Card
-      sx={{
-        p: { xs: 3, sm: 4 },
-        borderRadius: 4,
-        boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
-        borderLeft: "8px solid #ffb300",
-        transition: "transform 0.2s",
-        "&:hover": {
-          transform: "translateY(-6px)",
-          boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
-        },
-      }}
-    >
-      {/* Pulsing Icon */}
-      <Box
-        sx={{
-          mb: 2,
-          display: "flex",
-          justifyContent: "center",
-          animation: "pulse 1.5s ease-in-out infinite",
-          "@keyframes pulse": {
-            "0%, 100%": { transform: "scale(1)" },
-            "50%": { transform: "scale(1.3)" },
-          },
-        }}
-      >
-        <WarningIcon color="warning" sx={{ fontSize: 50 }} />
-      </Box>
+              <Card
+                sx={{
+                  p: { xs: 3, sm: 4 },
+                  borderRadius: 4,
+                  boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+                  borderLeft: "8px solid #4caf50",
+                  transition: "transform 0.2s",
+                  "&:hover": {
+                    transform: "translateY(-6px)",
+                    boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+                  },
+                }}
+              >
+                <Box
+                  sx={{
+                    mb: 2,
+                    display: "flex",
+                    justifyContent: "center",
+                    animation: "float 2s ease-in-out infinite",
+                    "@keyframes float": {
+                      "0%,100%": { transform: "translateY(0px)" },
+                      "50%": { transform: "translateY(-15px)" },
+                    },
+                  }}
+                >
+                  <MenuBookIcon color="success" sx={{ fontSize: 50 }} />
+                </Box>
+                <Typography
+                  variant="h3"
+                  fontWeight="bold"
+                  color="success.main"
+                  sx={{ fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" } }}
+                >
+                  {availableBooks}
+                </Typography>
+                <Typography
+                  color="text.secondary"
+                  variant="h6"
+                  sx={{ fontSize: { xs: "1rem", sm: "1.125rem" } }}
+                >
+                  Books List
+                </Typography>
+              </Card>
+            </Grid>
 
-      <Typography
-        variant="h3"
-        fontWeight="bold"
-        color="warning.main"
-        sx={{ fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" } }}
-      >
-        {overdueBooks}
-      </Typography>
-      <Typography
-        color="text.secondary"
-        variant="h6"
-        sx={{ fontSize: { xs: "1rem", sm: "1.125rem" } }}
-      >
-        Overdue Books
-      </Typography>
-    </Card>
-  </Grid>
+            <Grid item xs={12} sm={6} md={4}>
+              <Card
+                sx={{
+                  p: { xs: 3, sm: 4 },
+                  borderRadius: 4,
+                  boxShadow: "0 6px 16px rgba(0,0,0,0.15)",
+                  borderLeft: "8px solid #ffb300",
+                  transition: "transform 0.2s",
+                  "&:hover": {
+                    transform: "translateY(-6px)",
+                    boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+                  },
+                }}
+              >
+                <Box
+                  sx={{
+                    mb: 2,
+                    display: "flex",
+                    justifyContent: "center",
+                    animation: "pulse 1.5s ease-in-out infinite",
+                    "@keyframes pulse": {
+                      "0%,100%": { transform: "scale(1)" },
+                      "50%": { transform: "scale(1.3)" },
+                    },
+                  }}
+                >
+                  <WarningIcon color="warning" sx={{ fontSize: 50 }} />
+                </Box>
+                <Typography
+                  variant="h3"
+                  fontWeight="bold"
+                  color="warning.main"
+                  sx={{ fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" } }}
+                >
+                  {overdueBooks}
+                </Typography>
+                <Typography
+                  color="text.secondary"
+                  variant="h6"
+                  sx={{ fontSize: { xs: "1rem", sm: "1.125rem" } }}
+                >
+                  Overdue Books
+                </Typography>
+              </Card>
+            </Grid>
           </Grid>
 
           {/* Quick Actions */}
-          <Typography
-            variant="h6"
-            fontWeight="600"
-            color="text.primary"
-            sx={{ mb: 2, fontSize: { xs: "1rem", sm: "1.25rem" } }}
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: { opacity: 0, y: 30 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: { staggerChildren: 0.15 },
+              },
+            }}
           >
-            Quick Actions
-          </Typography>
-          <Grid container spacing={{ xs: 1.5, sm: 2 }} mb={4}>
-            <Grid item xs={12} sm={6} md={3}>
-              <Button
-                fullWidth
-                variant="contained"
-                color="success"
-                startIcon={<LibraryBooksIcon />}
-                onClick={() => navigate("/books")}
-                sx={{
-                  py: { xs: 1.2, sm: 1.5 },
-                  fontWeight: 600,
-                  borderRadius: 2,
-                  boxShadow: "0 3px 8px rgba(0,0,0,0.1)",
-                  textTransform: "none",
-                  fontSize: { xs: "0.875rem", sm: "1rem" },
-                }}
-              >
-                View Books
-              </Button>
+            <Typography
+              variant="h4"
+              fontWeight="bold"
+              color="success.main"
+              gutterBottom
+              sx={{ mb: 4, textAlign: { xs: "center", md: "left" } }}
+            >
+              Quick Actions
+            </Typography>
+            <Grid
+              container
+              spacing={{ xs: 2, sm: 3 }}
+              mb={6}
+              justifyContent="center"
+            >
+              {quickActions.map((action, index) => (
+                <Grid item xs={12} sm={6} md={3} key={index}>
+                  <motion.div
+                    variants={{
+                      hidden: { opacity: 0, y: 30 },
+                      visible: { opacity: 1, y: 0 },
+                    }}
+                    whileHover={{ scale: 1.07 }}
+                  >
+                    <Card
+                      onClick={() => navigate(action.path)}
+                      sx={{
+                        p: 2,
+                        borderRadius: 3,
+                        textAlign: "center",
+                        cursor: "pointer",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                      }}
+                    >
+                      <motion.div
+                        animate={{ y: [0, -8, 0] }}
+                        transition={{
+                          repeat: Infinity,
+                          duration: 2,
+                          ease: "easeInOut",
+                        }}
+                      >
+                        {React.cloneElement(action.icon, {
+                          sx: { fontSize: 40, color: `${action.color}.main` },
+                        })}
+                      </motion.div>
+                      <Typography
+                        variant="subtitle1"
+                        fontWeight="600"
+                        sx={{ mt: 1, color: `${action.color}.main` }}
+                      >
+                        {action.label}
+                      </Typography>
+                    </Card>
+                  </motion.div>
+                </Grid>
+              ))}
             </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Button
-                fullWidth
-                variant="contained"
-                color="success"
-                startIcon={<LibraryBooksIcon />}
-                onClick={() => navigate("/borrows")}
-                sx={{
-                  py: { xs: 1.2, sm: 1.5 },
-                  fontWeight: 600,
-                  borderRadius: 2,
-                  boxShadow: "0 3px 8px rgba(0,0,0,0.1)",
-                  textTransform: "none",
-                  fontSize: { xs: "0.875rem", sm: "1rem" },
-                }}
-              >
-                Borrow Books
-              </Button>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Button
-                fullWidth
-                variant="contained"
-                color="success"
-                startIcon={<LibraryBooksIcon />}
-                onClick={() => navigate("/my-borrows")}
-                sx={{
-                  py: { xs: 1.2, sm: 1.5 },
-                  fontWeight: 600,
-                  borderRadius: 2,
-                  boxShadow: "0 3px 8px rgba(0,0,0,0.1)",
-                  textTransform: "none",
-                  fontSize: { xs: "0.875rem", sm: "1rem" },
-                }}
-              >
-                {user?.role === "admin" || user?.role === "librarian"
-                  ? "All Borrowed Books"
-                  : "My Books"}
-              </Button>
-            </Grid>
-            <Grid item xs={12} sm={6} md={3}>
-              <Button
-                fullWidth
-                variant="contained"
-                color="success"
-                startIcon={<CategoryIcon />}
-                onClick={() => navigate("/categories")}
-                sx={{
-                  py: { xs: 1.2, sm: 1.5 },
-                  fontWeight: 600,
-                  borderRadius: 2,
-                  boxShadow: "0 3px 8px rgba(0,0,0,0.1)",
-                  textTransform: "none",
-                  fontSize: { xs: "0.875rem", sm: "1rem" },
-                }}
-              >
-                Categories
-              </Button>
-            </Grid>
-          </Grid>
+          </motion.div>
 
-          {/* Admin Controls */}
-          {["admin", "librarian"].includes(user.role) && (
-            <>
+          {/* Management Tools */}
+          {isAdminOrLibrarian && (
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { staggerChildren: 0.15 },
+                },
+              }}
+            >
               <Typography
-                variant="h6"
-                fontWeight="600"
-                color="text.primary"
-                sx={{
-                  mb: 2,
-                  mt: 3,
-                  fontSize: { xs: "1rem", sm: "1.25rem" },
-                }}
+                variant="h4"
+                fontWeight="bold"
+                color="success.main"
+                gutterBottom
+                sx={{ mb: 4, textAlign: { xs: "center", md: "left" } }}
               >
                 Management Tools
               </Typography>
-              <Grid container spacing={{ xs: 1.5, sm: 2 }}>
-                <Grid item xs={12} sm={6} md={4}>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    color="secondary"
-                    startIcon={<AddIcon />}
-                    onClick={() => navigate("/books/new")}
-                    sx={{
-                      py: { xs: 1.2, sm: 1.5 },
-                      fontWeight: 600,
-                      borderRadius: 2,
-                      boxShadow: "0 3px 8px rgba(0,0,0,0.1)",
-                      textTransform: "none",
-                      fontSize: { xs: "0.875rem", sm: "1rem" },
-                    }}
-                  >
-                    Add Book
-                  </Button>
-                </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    color="secondary"
-                    startIcon={<PeopleIcon />}
-                    onClick={() => navigate("/users")}
-                    sx={{
-                      py: { xs: 1.2, sm: 1.5 },
-                      fontWeight: 600,
-                      borderRadius: 2,
-                      boxShadow: "0 3px 8px rgba(0,0,0,0.1)",
-                      textTransform: "none",
-                      fontSize: { xs: "0.875rem", sm: "1rem" },
-                    }}
-                  >
-                    View Members
-                  </Button>
-                </Grid>
-                <Grid item xs={12} sm={6} md={4}>
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    color="secondary"
-                    startIcon={<PaidIcon />}
-                    onClick={() => navigate("/fines")}
-                    sx={{
-                      py: { xs: 1.2, sm: 1.5 },
-                      fontWeight: 600,
-                      borderRadius: 2,
-                      boxShadow: "0 3px 8px rgba(0,0,0,0.1)",
-                      textTransform: "none",
-                      fontSize: { xs: "0.875rem", sm: "1rem" },
-                    }}
-                  >
-                    Manage Fines
-                  </Button>
-                </Grid>
+              <Grid
+                container
+                spacing={{ xs: 2, sm: 3 }}
+                justifyContent="center"
+              >
+                {managementTools.map((tool, index) => (
+                  <Grid item xs={12} sm={6} md={4} key={index}>
+                    <motion.div
+                      variants={{
+                        hidden: { opacity: 0, y: 30 },
+                        visible: { opacity: 1, y: 0 },
+                      }}
+                      whileHover={{ scale: 1.06, rotateY: 6 }}
+                    >
+                      <Card
+                        onClick={() => navigate(tool.path)}
+                        sx={{
+                          p: 3,
+                          borderRadius: 3,
+                          textAlign: "center",
+                          cursor: "pointer",
+                          boxShadow: "0 4px 14px rgba(0,0,0,0.1)",
+                        }}
+                      >
+                        <motion.div
+                          animate={{ scale: [1, 1.1, 1] }}
+                          transition={{
+                            repeat: Infinity,
+                            duration: 2,
+                            ease: "easeInOut",
+                          }}
+                        >
+                          {React.cloneElement(tool.icon, {
+                            sx: { fontSize: 40, color: `${tool.color}.main` },
+                          })}
+                        </motion.div>
+                        <Typography
+                          variant="subtitle1"
+                          fontWeight="600"
+                          sx={{ mt: 1, color: `${tool.color}.main` }}
+                        >
+                          {tool.label}
+                        </Typography>
+                      </Card>
+                    </motion.div>
+                  </Grid>
+                ))}
               </Grid>
-            </>
+            </motion.div>
           )}
         </Box>
       </Box>
