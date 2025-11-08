@@ -1,3 +1,6 @@
+#Aman:- it wires your whole REST API, the browsable login, and JWT auth endpoints.
+#rest_framework_simplejwt must be installed and configured in settings.py for these endpoints to work.
+
 from django.urls import path,include
 # Default Router -> Automatically generates all the standard CRUD URL routes for the ModelViewSets
 from rest_framework.routers import DefaultRouter
@@ -20,6 +23,12 @@ URL Prefix -> /users/
 Automatically Generated Endpoints -> GET,POST,PUT,PATCH,DELETE
 
 We didn't have to manually define these URLs - DRF's DefaultRouter did it for us automatically
+"""
+"""
+Aman
+->prefix becomes the URL path segment (e.g., /users/).
+->The router inspects the viewset and creates routes for actions (list, retrieve, etc.). 
+->It also maps custom @action decorators to users/me/ or users/{pk}/custom_action/ automatically.
 """
 router = DefaultRouter()
 router.register(r'users',views.UserViewSet)
