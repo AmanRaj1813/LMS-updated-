@@ -18,6 +18,30 @@ export const fetchCurrentUser = createAsyncThunk('auth/fetchCurrentUser', async 
   return response;
 });
 
+/**
+[User] → enters credentials
+   ↓
+[Login.jsx] → dispatch(login(credentials))
+   ↓
+[authSlice → login thunk]
+   ↓
+[apiClient] → POST /api/token/
+   ↓
+[Backend (Django)] → returns JWT tokens
+   ↓
+[authSlice] → stores token in localStorage & updates Redux
+   ↓
+dispatch(fetchCurrentUser())
+   ↓
+[apiClient] → GET /users/me/
+   ↓
+[authSlice] → updates user info
+   ↓
+React Router → navigate("/dashboard")
+
+*/
+
+
 const authSlice = createSlice({
   name: 'auth',
   initialState: {
