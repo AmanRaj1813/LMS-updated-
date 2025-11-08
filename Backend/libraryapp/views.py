@@ -15,12 +15,27 @@ from .permissions import IsAdminOrLibrarian
 from rest_framework import status
 from django.core.mail import send_mail
 from django.conf import settings
+"""
+ModelViewSet is a powerful abstraction in Django REST Framework that automatically
+provides all CRUD Operations (Create , Retrieve, Update, Delete ) for a model using a single class
+
+Why are these better than generic views
+ a) Full CRUD API for a model where as Generic views provide only one or few specific operation
+ b) Minimal Boiler Plate
+ c) No need to explicitly define URLs these are automatically handled via DRF's router
+ d)Supported by @action decorator
+
+
+"""
+
+
+
 # Fixed UserViewSet - removed duplicate class definition
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes= [IsAdminUser]
-# for cuurent profile   
+# for current profile   
     @action(detail = False, methods = ['get'] , permission_classes = [IsAuthenticated])
     def me(self,request):
         serializer = self.get_serializer(request.user)
