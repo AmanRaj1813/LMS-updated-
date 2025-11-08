@@ -274,6 +274,8 @@ Flow:
         return Response({'message': f'Fine of ₹{record.fine_amount} for {record.book.title} marked as paid'})
 
     #email
+    #Librarian can send a custom email to the borrower for a specific borrow record.
+    #Uses Django send_mail with settings.EMAIL_HOST_USER.
     @action(detail=True, methods=['post'], permission_classes=[IsAdminOrLibrarian])
     def send_email(self, request, pk=None):
         """Allow librarian/admin to send a custom email to the borrower"""
@@ -286,6 +288,7 @@ Flow:
      # Extracts the email subject and message from the POST body the frontend sends
         subject = request.data.get('subject')
         message = request.data.get('message')
+     
 
      #Validation
      #If either subject or message is missing, return a 400 (bad request) response with an err-
@@ -314,7 +317,7 @@ Flow:
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-
+#Categories (book categories) can be read by any logged-in user; creation/deletion reserved for admin/librarian.
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
