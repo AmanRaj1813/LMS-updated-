@@ -3,6 +3,7 @@ import axios from "axios";
 const API_BASE_URL = "http://localhost:8000/api";
 
 // Create axios instance with base configuration
+// All API calls will automatically start with this Base URL
 const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -11,6 +12,7 @@ const axiosInstance = axios.create({
 });
 
 // Request interceptor to add token
+//Automatically adds Authorization: Bearer<token> to every request
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("access_token");
