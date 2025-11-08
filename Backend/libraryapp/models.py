@@ -1,4 +1,5 @@
-
+#Aman:-models: Django ORM for defining database tables.
+#Aman:-AbstractUser: Base class for custom user models.
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from datetime import timedelta,datetime
@@ -10,7 +11,7 @@ class User(AbstractUser):
         ('member', 'Member'),
     )
     role = models.CharField(max_length=10, choices=ROLES, default='member')
-
+#Aman:- __str__ (Returns username for readability) , choices restricts field values to predefined options.
     def __str__(self):
         return self.username
 
@@ -25,6 +26,7 @@ class Category(models.Model):
         return self.name
 
 
+
 class Book(models.Model):
     STATUS_CHOICES = (
         ('available', 'Available'),
@@ -33,8 +35,11 @@ class Book(models.Model):
     )
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=200)
-    category = models.ForeignKey(Category, related_name='books', on_delete=models.CASCADE)
-    ISBN = models.CharField(max_length=13, unique=True)
+    category = models.ForeignKey(Category, related_name='books', on_delete=models.CASCADE) 
+    #Aman:- ForeignKey links book to category. 
+    #models.cascade (If the parent object (referenced model) is deleted, all related child objects will also be deleted automatically.)
+    
+    ISBN = models.CharField(max_length=13, unique=True) #Aman:- ISBN is unique for each book.
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='available')
 
     def __str__(self):
