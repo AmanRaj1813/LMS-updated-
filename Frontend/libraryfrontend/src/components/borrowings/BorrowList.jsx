@@ -35,10 +35,23 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import CloseIcon from "@mui/icons-material/Close";
 
 const BorrowList = () => {
+  // useDispatch - sends instructions to Redux Store
+  // we use useDispatch to call Redux actions or thunks ( functions that perform async logic)
   const dispatch = useDispatch();
+  // useSelector - It reads data from redux store
+  // It allows our component to access whatever slice of data it needs
+  /**
+  This extracts data from the Redux store's borrows slice
+  -> records - list of borrow records
+  -> loading - whether data is currently being fetched
+  -> error - any API error
+  -> successMessage -> success info for snackbar
+
+  */
   const { records, loading, error, successMessage } = useSelector(
     (state) => state.borrows
   );
+  // used to get the logged in user info from the auth slice
   const { user } = useSelector((state) => state.auth);
 
   const [returningIds, setReturningIds] = useState([]);
@@ -59,15 +72,42 @@ const BorrowList = () => {
   const isAdminOrLibrarian =
     user?.role === "admin" || user?.role === "librarian";
 
+  
+/**
+- Calls the Backend API /borrow-records/
+- Redux updates state with the list of borrow records
+- BorrowList re-renders showing fetched data
+*/
   useEffect(() => {
     dispatch(fetchBorrowRecords());
   }, [dispatch]);
 
+  // asynchronous function named handleReturn taking id parameter of the book to be deleted
   const handleReturn = async (id) => {
+    // confirmation popup appears when the user clicks on the Return button
     if (window.confirm("Are you sure you want to return this book?")) {
+      /**
+      setReturningIds takes a callback:
+
+      prev → the previous array of returning book IDs.
+      
+      [...prev, id] → adds the new id to the list.
+      
+      Example:
+      
+      If prev = [101, 102] and the user returns book 103,
+      → new state becomes [101, 102, 103].
+      */
       setReturningIds((prev) => [...prev, id]);
+      //Make an API request to mark the book as returned in the backend
+      // Update the Redux store to reflect that the book is no longer borrowed
       await dispatch(returnBorrowedBook(id));
       dispatch(fetchBorrowRecords());
+      // Now that the return process for this book is complete, remove it's ID from the
+      // returningIds list
+      // filter() creates a new array excluding the given id
+      // This ensures that the loading spinner or disabled state for that book is cleared
+      // after completion
       setReturningIds((prev) => prev.filter((bookId) => bookId !== id));
     }
   };
