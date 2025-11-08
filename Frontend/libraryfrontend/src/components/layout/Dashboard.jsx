@@ -360,7 +360,8 @@ const Dashboard = () => {
           </Typography>
 
           {/* Statistics Cards */}
-          <Grid container spacing={{ xs: 2, sm: 4 }} mb={6}>
+          <Grid container spacing={{ xs: 2, sm: 4 }} mb={6}
+            sx={{ml:{xs:2,sm:4,md:6,lg:8}}}>
             <Grid item xs={12} sm={6} md={4}>
               <Card
                 sx={{
