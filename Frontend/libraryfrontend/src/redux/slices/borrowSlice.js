@@ -122,7 +122,13 @@ const borrowSlice = createSlice({
       })
       .addCase(returnBorrowedBook.fulfilled, (state, action) => {
         state.loading = false;
+        //message taken by the snackbar to show in UI
         state.successMessage = action.payload.message;
+        // This updates our existing borrowRecords array to mark the returned book as returned
+        // immediately -even before fetching fresh data from the backend
+        // The find() call locates the record that was just returned
+        // we set it's return_date field to the current time
+        // This makes our UI show the record as Returned without waiting for another API call
         const record = state.records.find((r) => r.id === action.payload.id);
         if (record) {
           record.return_date = new Date().toISOString();
