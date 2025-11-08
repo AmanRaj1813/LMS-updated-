@@ -1,12 +1,16 @@
 from rest_framework import serializers
 from .models import User, Book, BorrowRecord, Category
-
+"""
+Aman:- 
+This file defines how User, Book, BorrowRecord, and Category objects are converted to/from JSON and 
+enforces validation and creation/update logic that’s safer than letting raw model fields be written directly.
+"""
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email', 'password', 'role']
-        extra_kwargs = {'password': {'write_only': True}}
+        extra_kwargs = {'password': {'write_only': True}} #makes password accepted on input but excluded from output JSON. Good for security.
 
     def create(self, validated_data):
         user = User.objects.create_user(
@@ -43,7 +47,7 @@ class BorrowRecordSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'book', 'book_id', 'borrow_date', 'due_date', 'return_date', 'user_info','fine_amount','fine_paid']
         read_only_fields = ['user', 'borrow_date', 'return_date','fine_amount','fine_paid']
     
-    def get_user_info(self, obj):
+    def get_user_info(self, obj): #Only users with role admin or librarian will see borrower details. Normal users get null in user_info.
         """Return user information for admin/librarian"""
         request = self.context.get('request')
         if request and hasattr(request, 'user'):
