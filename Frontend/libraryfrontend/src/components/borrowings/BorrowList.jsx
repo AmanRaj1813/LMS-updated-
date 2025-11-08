@@ -157,6 +157,7 @@ const BorrowList = () => {
             autoHideDuration={4000}
             onClose={() => dispatch(clearBorrowSuccess())}
             anchorOrigin={{ vertical: "top", horizontal: "center" }}
+            sx = {{mt:8}}
           >
             <Alert
               onClose={() => dispatch(clearBorrowSuccess())}
