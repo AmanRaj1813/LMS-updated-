@@ -3,3 +3,6 @@ backend/venv/
 
 # Node modules for frontend
 frontend/libraryfrontend/node_modules/
+
+#Environment variables file
+backend/.env
