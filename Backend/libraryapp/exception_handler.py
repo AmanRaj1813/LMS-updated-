@@ -5,8 +5,15 @@ from rest_framework import status
 import logging
 
 logger = logging.getLogger(__name__)
-
-def custom_exception_handler(exc, context):
+"""
+Aman:-
+->exception_handler is DRF’s default function that maps many built-in exceptions (ValidationError, AuthenticationFailed, PermissionDenied, NotFound, etc.) into Response objects with appropriate status codes.
+->logger is configured using the module’s __name__. It will use Django’s logging configuration to write to console/file/remote sink.
+->For ValidationError, exception_handler returns a 400 with response.data containing field errors. 
+->For NotAuthenticated -> 401, PermissionDenied -> 403, etc. For unknown exceptions it returns None.
+->Use logger.exception(...) or logger.error(..., exc_info=True) to capture tracebacks where backend is disturbed.
+"""
+def custom_exception_handler(exc, context): #exc is exception instance
     """
     Custom global exception handler for DRF.
     """
