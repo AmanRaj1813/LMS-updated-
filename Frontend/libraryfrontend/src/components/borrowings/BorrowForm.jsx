@@ -64,6 +64,9 @@ const BorrowForm = () => {
       await dispatch(createBorrowRecord(formData)).unwrap();
       toast.success("Book borrowed successfully!");
       setFormData({ book_id: "", due_date: "" });
+        const response = await apiClient.get("/books/");
+        const availableBooks = response.filter((book) => book.status === "available");
+        setBooks(availableBooks);
     } catch (err) {
       toast.error(err || "Failed to borrow book");
     }
